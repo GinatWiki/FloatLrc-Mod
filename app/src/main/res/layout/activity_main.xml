@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".MainActivity">
 
 
@@ -61,24 +62,35 @@
 
     </LinearLayout>
 
-    <!-- 字幕层：字幕模式下显示，背景为网页可视化 -->
+    <!-- 字幕层：字幕模式下显示，全黑背景、居中大字 -->
     <TextView
         android:id="@+id/subtitle_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/subtitle_scrim"
+        android:layout_centerInParent="true"
         android:gravity="center"
-        android:paddingLeft="16dp"
-        android:paddingTop="48dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="24dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
         android:textSize="48sp"
         android:textStyle="bold"
         android:shadowColor="#FF000000"
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="6"
+        android:visibility="gone" />
+
+    <!-- 字幕字号拉条：字幕模式下显示于底部 -->
+    <SeekBar
+        android:id="@+id/subtitle_size_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:layout_marginBottom="16dp"
+        android:min="24"
+        android:max="72"
+        android:progress="48"
         android:visibility="gone" />
 
     <!-- 退出字幕模式按钮 -->

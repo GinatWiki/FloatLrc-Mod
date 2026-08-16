@@ -21,6 +21,7 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,6 +34,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +60,7 @@ public class MainActivity extends Activity {
     private View bottomBar;
     private TextView subtitleText;
     private Button exitSubtitleButton;
+    private SeekBar subtitleSizeSeekbar;
     private LyricPoller lyricPoller;
     private boolean subtitleMode = false;
 
@@ -88,6 +91,27 @@ public class MainActivity extends Activity {
         bottomBar = findViewById(R.id.bottom_bar);
         subtitleText = findViewById(R.id.subtitle_text);
         exitSubtitleButton = findViewById(R.id.btn_exit_subtitle);
+        subtitleSizeSeekbar = findViewById(R.id.subtitle_size_seekbar);
+        int subtitleSize = getSubtitleSize();
+        subtitleSizeSeekbar.setProgress(subtitleSize);
+        subtitleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, subtitleSize);
+        subtitleSizeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                subtitleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                SharedPreferences.Editor editor = getSharedPreferences("SubtitleSize", MODE_PRIVATE).edit();
+                editor.putInt("SubtitleSize", seekBar.getProgress());
+                editor.commit();
+            }
+        });
         lyricPoller = new LyricPoller(mWebView, new LyricPoller.Listener() {
             @Override
             public void onLyric(String lyric) {
@@ -228,8 +252,10 @@ public class MainActivity extends Activity {
         // 进入字幕播放：开启防息屏
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         bottomBar.setVisibility(View.GONE);
+        mWebView.setVisibility(View.GONE);
         subtitleText.setVisibility(View.GONE);
         exitSubtitleButton.setVisibility(View.VISIBLE);
+        subtitleSizeSeekbar.setVisibility(View.VISIBLE);
         enterImmersive();
         hidePageLyricElement();
         lyricPoller.start();
@@ -251,6 +277,8 @@ public class MainActivity extends Activity {
         exitImmersive();
         subtitleText.setVisibility(View.GONE);
         exitSubtitleButton.setVisibility(View.GONE);
+        subtitleSizeSeekbar.setVisibility(View.GONE);
+        mWebView.setVisibility(View.VISIBLE);
         bottomBar.setVisibility(View.VISIBLE);
     }
 
@@ -345,6 +373,11 @@ public class MainActivity extends Activity {
     private int getLyricColor() {
         SharedPreferences colorInfo = getSharedPreferences("Color", MODE_PRIVATE);
         return colorInfo.getInt("Color", Color.parseColor("#bb00ff"));
+    }
+
+    /** 字幕模式字号（SharedPreferences "SubtitleSize"，默认 48sp，范围 24-72） */
+    private int getSubtitleSize() {
+        return getSharedPreferences("SubtitleSize", MODE_PRIVATE).getInt("SubtitleSize", 48);
     }
 
     /** 色彩轮盘弹窗：选择悬浮歌词颜色并持久化 */
