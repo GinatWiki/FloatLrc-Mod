@@ -26,6 +26,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
@@ -147,6 +148,10 @@ public class MainActivity extends Activity {
         subtitlePauseButton = findViewById(R.id.btn_subtitle_pause);
         updatePauseButton();
         subtitleBrightnessSeekbar = findViewById(R.id.subtitle_brightness_seekbar);
+        // 亮度条竖向显示（rotation=270），视觉长度 = 布局高度：按屏幕高度 60% 计算
+        ViewGroup.LayoutParams brightnessLp = subtitleBrightnessSeekbar.getLayoutParams();
+        brightnessLp.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.6f);
+        subtitleBrightnessSeekbar.setLayoutParams(brightnessLp);
         int subtitleBrightness = getSubtitleBrightness();
         subtitleBrightnessSeekbar.setProgress(subtitleBrightness);
         applySubtitleBrightness(subtitleBrightness);
