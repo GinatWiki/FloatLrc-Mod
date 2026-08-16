@@ -1,4 +1,4 @@
-﻿package com.folatkikoeru.app;
+package com.folatkikoeru.app;
 
 import android.os.Handler;
 import android.os.Looper;

@@ -1,4 +1,4 @@
-﻿package com.folatkikoeru.app;
+package com.folatkikoeru.app;
 
 import android.content.Context;
 import android.util.AttributeSet;

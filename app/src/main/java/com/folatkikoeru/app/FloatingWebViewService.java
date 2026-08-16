@@ -1,4 +1,4 @@
-﻿package com.folatkikoeru.app;
+package com.folatkikoeru.app;
 
 import android.app.Service;
 import android.content.Intent;

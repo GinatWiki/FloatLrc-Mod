@@ -1,4 +1,4 @@
-﻿package com.folatkikoeru.app;
+package com.folatkikoeru.app;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
