@@ -12,12 +12,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '11'
-
+      # Android SDK 步骤放在 setup-java 之前：用 runner 默认 JDK 17 跑 sdkmanager
+      # （cmdline-tools 12+ 要求 JDK 17+）
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
@@ -27,6 +23,13 @@ jobs:
 
       - name: Accept licenses
         run: yes | sdkmanager --licenses || true
+
+      # 构建用 JDK 11（AGP 7.1 / Gradle 7.2 wrapper 的标准组合）
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
 
       - name: Set up Gradle (wrapper)
         uses: gradle/actions/setup-gradle@v3
