@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <!-- 搴曢儴鎺у埗鏉?-->
+    <!-- 底部控制条 -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
@@ -61,7 +61,7 @@
 
     </LinearLayout>
 
-    <!-- 瀛楀箷灞傦細瀛楀箷妯″紡涓嬫樉绀猴紝鑳屾櫙涓虹綉椤靛彲瑙嗗寲 -->
+    <!-- 字幕层：字幕模式下显示，背景为网页可视化 -->
     <TextView
         android:id="@+id/subtitle_text"
         android:layout_width="match_parent"
@@ -81,7 +81,7 @@
         android:shadowRadius="6"
         android:visibility="gone" />
 
-    <!-- 閫€鍑哄瓧骞曟ā寮忔寜閽?-->
+    <!-- 退出字幕模式按钮 -->
     <Button
         android:id="@+id/btn_exit_subtitle"
         android:layout_width="48dp"

@@ -11,8 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * 鑷粯 HSV 鑹插僵杞洏锛氳搴?鑹茬浉锛坔ue锛夛紝鍗婂緞=楗卞拰搴︼紙saturation锛夛紝浜害鍥哄畾涓?1銆?
- * 涓績鍦嗗唴鏄剧ず褰撳墠閫変腑棰滆壊锛岀偣鍑?鎷栧姩鑹茬幆閫夊彇棰滆壊銆?
+ * 自绘 HSV 色彩轮盘：角度=色相（hue），半径=饱和度（saturation），亮度固定为 1。
+ * 中心圆内显示当前选中颜色，点击/拖动色环选取颜色。
  */
 public class ColorWheelView extends View {
 
@@ -20,7 +20,7 @@ public class ColorWheelView extends View {
         void onColorChanged(int color);
     }
 
-    /** 涓績绌虹櫧锛堥€変腑鑹查瑙堬級鍗婂緞鍗犳暣涓疆鐩樺崐寰勭殑姣斾緥 */
+    /** 中心空白（选中色预览）半径占整个轮盘半径的比例 */
     private static final float INNER_RADIUS_FRACTION = 0.28f;
 
     private int selectedColor = Color.parseColor("#bb00ff");
@@ -60,14 +60,14 @@ public class ColorWheelView extends View {
         this.listener = l;
     }
 
-    /** 璁剧疆褰撳墠閫変腑棰滆壊锛堝悓鏃舵洿鏂版寚绀虹偣浣嶇疆锛?*/
+    /** 设置当前选中颜色（同时更新指示点位置） */
     public void setColor(int color) {
         selectedColor = color;
         Color.colorToHSV(color, hsv);
         invalidate();
     }
 
-    /** 褰撳墠閫変腑棰滆壊 */
+    /** 当前选中颜色 */
     public int getColor() {
         return selectedColor;
     }
@@ -80,7 +80,7 @@ public class ColorWheelView extends View {
         }
     }
 
-    /** 閫愬儚绱犵敓鎴愯壊鐜綅鍥撅紝size 鍙樺寲鏃堕噸寤?*/
+    /** 逐像素生成色环位图，size 变化时重建 */
     private void buildWheelBitmap(int size) {
         wheelBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         float cx = size / 2f;
@@ -98,7 +98,7 @@ public class ColorWheelView extends View {
                     pixels[y * size + x] = Color.TRANSPARENT;
                     continue;
                 }
-                // hue锛?掳 鍦ㄦ鍙虫柟锛岄『鏃堕拡锛泂at锛氬唴鍦?0 鈫?澶栧湀 1
+                // hue：0° 在正右方，顺时针；sat：内圈 0 → 外圈 1
                 float hue = (float) ((Math.toDegrees(Math.atan2(dy, dx)) + 360f) % 360f);
                 float sat = (r - innerR) / (outerR - innerR);
                 hsvLocal[0] = hue;
@@ -127,16 +127,16 @@ public class ColorWheelView extends View {
 
         canvas.drawBitmap(wheelBitmap, left, top, null);
 
-        // 涓績鍦嗗～鍏呭綋鍓嶉€変腑鑹诧紙棰勮锛?
+        // 中心圆填充当前选中色（预览）
         Paint centerPaint = indicatorFillPaint;
         centerPaint.setColor(selectedColor);
         canvas.drawCircle(cx, cy, innerR - dp(3f), centerPaint);
         canvas.drawCircle(cx, cy, innerR - dp(3f), borderPaint);
 
-        // 澶栧湀鎻忚竟
+        // 外圈描边
         canvas.drawCircle(cx, cy, outerR - borderPaint.getStrokeWidth() / 2f, borderPaint);
 
-        // 閫変腑鎸囩ず鐐?
+        // 选中指示点
         float indicatorR = innerR + (outerR - innerR) * Math.min(1f, hsv[1]);
         float angle = (float) Math.toRadians(hsv[0]);
         float ix = cx + (float) (indicatorR * Math.cos(angle));

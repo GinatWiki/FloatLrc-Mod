@@ -7,22 +7,16 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
+import org.jetbrains.annotations.Nullable;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Timer;
-import java.util.TimerTask;
-
 
 public class FloatingWebViewService extends Service {
     public static boolean isStarted = false;
@@ -151,9 +145,9 @@ public class FloatingWebViewService extends Service {
 
             mWebView = new WebView(this);
 
-            mWebView.getSettings().setJavaScriptEnabled(true); //璁剧疆鍏佽Js
+            mWebView.getSettings().setJavaScriptEnabled(true); //设置允许Js
 
-            /*璁剧疆webview鎺т欢鑳屾櫙閫忔槑*/
+            /*设置webview控件背景透明*/
 
             mWebView.setBackgroundColor(Color.TRANSPARENT);
 

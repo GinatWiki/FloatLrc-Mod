@@ -8,13 +8,13 @@ import android.webkit.WebView;
 import org.json.JSONArray;
 
 /**
- * 姣?100ms 杞缃戦〉 {@code #lyric} 鍏冪礌鐨?innerText锛屼緵鎮诞绐椾笌瀛楀箷妯″紡鍏辩敤銆?
- * 鍥炶皟鍧囧彂鐢熷湪涓荤嚎绋嬶紱WebView 涓虹┖鎴栦笉鍙敤鏃跺洖璋?null銆?
+ * 每 100ms 轮询网页 {@code #lyric} 元素的 innerText，供悬浮窗与字幕模式共用。
+ * 回调均发生在主线程；WebView 为空或不可用时回调 null。
  */
 public class LyricPoller {
 
     public interface Listener {
-        /** lyric 涓?null 鎴栫┖涓茶〃绀烘殏鏃犳瓕璇?涓嶅彲鐢ㄣ€?*/
+        /** lyric 为 null 或空串表示暂无歌词/不可用。 */
         void onLyric(String lyric);
     }
 
@@ -69,12 +69,12 @@ public class LyricPoller {
                         }
                     });
         } catch (Exception e) {
-            // WebView 宸查攢姣佺瓑鍦烘櫙锛氳涓烘殏鏃犳瓕璇嶏紝杞缁х画锛屽彲鑷剤
+            // WebView 已销毁等场景：视为暂无歌词，轮询继续，可自愈
             listener.onLyric(null);
         }
     }
 
-    /** 鍓ラ櫎 evaluateJavascript 杩斿洖鍊肩殑 JSON 寮曞彿涓庤浆涔?*/
+    /** 剥除 evaluateJavascript 返回值的 JSON 引号与转义 */
     private static String unquote(String s) {
         if (s == null) {
             return null;
