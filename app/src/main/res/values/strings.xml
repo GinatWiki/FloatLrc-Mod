@@ -17,5 +17,7 @@
     <string name="color_preview">歌词颜色预览</string>
     <string name="color_saved">颜色已保存</string>
     <string name="exit_subtitle">✕</string>
+    <string name="subtitle_pause_symbol">❚❚</string>
+    <string name="subtitle_resume_symbol">▶</string>
 
 </resources>

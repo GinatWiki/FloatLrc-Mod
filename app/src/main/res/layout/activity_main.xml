@@ -87,6 +87,20 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
+    <!-- 字幕亮度拉条：字幕模式下显示于左侧（竖向，上=更亮 下=更暗） -->
+    <SeekBar
+        android:id="@+id/subtitle_brightness_seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="240dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="12dp"
+        android:rotation="270"
+        android:min="20"
+        android:max="100"
+        android:progress="100"
+        android:visibility="gone" />
+
     <!-- 字幕字号拉条：字幕模式下显示于底部 -->
     <SeekBar
         android:id="@+id/subtitle_size_seekbar"
@@ -114,6 +128,21 @@
         android:text="@string/exit_subtitle"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
+        android:visibility="gone" />
+
+    <!-- 字幕播放/暂停按钮（暂停时字幕不显示） -->
+    <Button
+        android:id="@+id/btn_subtitle_pause"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/btn_exit_subtitle"
+        android:layout_margin="12dp"
+        android:background="@drawable/exit_button_bg"
+        android:onClick="toggleSubtitlePause"
+        android:text="@string/subtitle_pause_symbol"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
         android:visibility="gone" />
 
 

@@ -61,10 +61,13 @@ public class MainActivity extends Activity {
     private View bottomBar;
     private TextView subtitleText;
     private Button exitSubtitleButton;
+    private Button subtitlePauseButton;
     private SeekBar subtitleSizeSeekbar;
+    private SeekBar subtitleBrightnessSeekbar;
     private View subtitleTouchLayer;
     private LyricPoller lyricPoller;
     private boolean subtitleMode = false;
+    private boolean subtitlePaused = false;
 
     /** 字幕模式控制条自动隐藏延时（5 秒） */
     private static final long CONTROLS_HIDE_DELAY_MS = 5000L;
@@ -76,7 +79,9 @@ public class MainActivity extends Activity {
                 return;
             }
             subtitleSizeSeekbar.setVisibility(View.GONE);
+            subtitleBrightnessSeekbar.setVisibility(View.GONE);
             exitSubtitleButton.setVisibility(View.GONE);
+            subtitlePauseButton.setVisibility(View.GONE);
         }
     };
 
@@ -137,6 +142,33 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 showSubtitleControls();
+            }
+        });
+        subtitlePauseButton = findViewById(R.id.btn_subtitle_pause);
+        updatePauseButton();
+        subtitleBrightnessSeekbar = findViewById(R.id.subtitle_brightness_seekbar);
+        int subtitleBrightness = getSubtitleBrightness();
+        subtitleBrightnessSeekbar.setProgress(subtitleBrightness);
+        applySubtitleBrightness(subtitleBrightness);
+        subtitleBrightnessSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                applySubtitleBrightness(progress);
+                // 拖动期间重置自动隐藏倒计时，避免拉条中途消失
+                if (subtitleMode) {
+                    scheduleControlsHide();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                SharedPreferences.Editor editor = getSharedPreferences("SubtitleBrightness", MODE_PRIVATE).edit();
+                editor.putInt("SubtitleBrightness", seekBar.getProgress());
+                editor.commit();
             }
         });
         lyricPoller = new LyricPoller(mWebView, new LyricPoller.Listener() {
@@ -282,8 +314,12 @@ public class MainActivity extends Activity {
         mWebView.setVisibility(View.GONE);
         subtitleText.setVisibility(View.GONE);
         subtitleTouchLayer.setVisibility(View.VISIBLE);
+        subtitlePaused = false;
+        updatePauseButton();
         exitSubtitleButton.setVisibility(View.VISIBLE);
+        subtitlePauseButton.setVisibility(View.VISIBLE);
         subtitleSizeSeekbar.setVisibility(View.VISIBLE);
+        subtitleBrightnessSeekbar.setVisibility(View.VISIBLE);
         enterImmersive();
         hidePageLyricElement();
         lyricPoller.start();
@@ -300,15 +336,21 @@ public class MainActivity extends Activity {
             return;
         }
         subtitleMode = false;
-        // 退出字幕播放：恢复系统默认息屏
+        // 退出字幕播放：恢复系统默认息屏；若仍处于暂停状态则恢复网页音乐
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (subtitlePaused) {
+            resumeWebAudio();
+        }
+        subtitlePaused = false;
         controlsHandler.removeCallbacks(hideControlsRunnable);
         lyricPoller.stop();
         restorePageLyricElement();
         exitImmersive();
         subtitleText.setVisibility(View.GONE);
         exitSubtitleButton.setVisibility(View.GONE);
+        subtitlePauseButton.setVisibility(View.GONE);
         subtitleSizeSeekbar.setVisibility(View.GONE);
+        subtitleBrightnessSeekbar.setVisibility(View.GONE);
         subtitleTouchLayer.setVisibility(View.GONE);
         mWebView.setVisibility(View.VISIBLE);
         bottomBar.setVisibility(View.VISIBLE);
@@ -326,12 +368,80 @@ public class MainActivity extends Activity {
             return;
         }
         exitSubtitleButton.setVisibility(View.VISIBLE);
+        subtitlePauseButton.setVisibility(View.VISIBLE);
         subtitleSizeSeekbar.setVisibility(View.VISIBLE);
+        subtitleBrightnessSeekbar.setVisibility(View.VISIBLE);
         scheduleControlsHide();
     }
 
-    /** 歌词轮询回调（主线程）：空歌词时隐藏字幕层；清理前导/尾部空白防止居中偏移 */
+    // ==================== 字幕播放/暂停 ====================
+
+    /** 播放/暂停切换：暂停时网页音乐停止、字幕隐藏 */
+    public void toggleSubtitlePause(View view) {
+        if (!subtitleMode) {
+            return;
+        }
+        subtitlePaused = !subtitlePaused;
+        updatePauseButton();
+        if (subtitlePaused) {
+            pauseWebAudio();
+            subtitleText.setVisibility(View.GONE);
+        } else {
+            resumeWebAudio();
+        }
+        scheduleControlsHide();
+    }
+
+    private void updatePauseButton() {
+        if (subtitlePauseButton == null) {
+            return;
+        }
+        subtitlePauseButton.setText(subtitlePaused ? R.string.subtitle_resume_symbol : R.string.subtitle_pause_symbol);
+    }
+
+    /** 暂停网页音乐：记录正在播放的 audio/video 元素并全部暂停 */
+    private void pauseWebAudio() {
+        if (mWebView == null) {
+            return;
+        }
+        try {
+            mWebView.evaluateJavascript(
+                    "javascript:(function(){"
+                            + "if(window.__fk_paused){return 0;}"
+                            + "window.__fk_paused=[];"
+                            + "var els=document.querySelectorAll('audio,video');"
+                            + "for(var i=0;i<els.length;i++){if(!els[i].paused){window.__fk_paused.push(els[i]);els[i].pause();}}"
+                            + "return window.__fk_paused.length;"
+                            + "})()",
+                    null);
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** 恢复网页音乐：仅恢复此前由本应用暂停的元素 */
+    private void resumeWebAudio() {
+        if (mWebView == null) {
+            return;
+        }
+        try {
+            mWebView.evaluateJavascript(
+                    "javascript:(function(){"
+                            + "if(!window.__fk_paused){return 0;}"
+                            + "var saved=window.__fk_paused;window.__fk_paused=null;"
+                            + "for(var i=0;i<saved.length;i++){var p=saved[i].play();if(p&&p.then){p.then(function(){}).catch(function(){});}}"
+                            + "return saved.length;"
+                            + "})()",
+                    null);
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** 歌词轮询回调（主线程）：空歌词或已暂停时隐藏字幕层；清理前导/尾部空白防止居中偏移 */
     private void onLyricUpdate(String lyric) {
+        if (subtitlePaused) {
+            subtitleText.setVisibility(View.GONE);
+            return;
+        }
         String clean = lyric == null ? null : lyric.replace('\u00A0', ' ').trim();
         if (clean == null || clean.isEmpty()) {
             subtitleText.setVisibility(View.GONE);
@@ -428,6 +538,16 @@ public class MainActivity extends Activity {
     /** 字幕模式字号（SharedPreferences "SubtitleSize"，默认 48sp，范围 24-100） */
     private int getSubtitleSize() {
         return getSharedPreferences("SubtitleSize", MODE_PRIVATE).getInt("SubtitleSize", 48);
+    }
+
+    /** 字幕亮度（SharedPreferences "SubtitleBrightness"，默认 100%，范围 20-100） */
+    private int getSubtitleBrightness() {
+        return getSharedPreferences("SubtitleBrightness", MODE_PRIVATE).getInt("SubtitleBrightness", 100);
+    }
+
+    /** 将亮度百分比应用到字幕文本（黑底上降低视图 alpha 即调暗，防夜间刺眼） */
+    private void applySubtitleBrightness(int percent) {
+        subtitleText.setAlpha(percent / 100f);
     }
 
     /** 色彩轮盘弹窗：选择悬浮歌词颜色并持久化 */
