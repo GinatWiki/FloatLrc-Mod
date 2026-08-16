@@ -61,7 +61,7 @@
 ## 技术要点
 
 - 语言：Java；minSdk 26 / targetSdk 31 / compileSdk 31；AGP 7.1
-- 应用包名：`com.folatkikoeru.app`（v1.9 / versionCode 9）
+- 应用包名：`com.folatkikoeru.app`（v1.10 / versionCode 10）
 - 悬浮窗：`WindowManager` + `TYPE_APPLICATION_OVERLAY`
 - 歌词抓取：`WebView.evaluateJavascript` 每 100ms 轮询 `#lyric` 的 `innerText`
 - 依赖：`com.github.lzyzsd:jsbridge:1.0.4`（JitPack）

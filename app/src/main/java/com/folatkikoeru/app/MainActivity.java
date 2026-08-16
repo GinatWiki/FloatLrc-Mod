@@ -11,8 +11,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -148,15 +150,7 @@ public class MainActivity extends Activity {
         subtitlePauseButton = findViewById(R.id.btn_subtitle_pause);
         updatePauseButton();
         subtitleBrightnessSeekbar = findViewById(R.id.subtitle_brightness_seekbar);
-        // 竖向 SeekBar（rotation=270）：轨道沿宽度方向，视觉长度 = 布局宽度；
-        // 旋转绕视图中心，宽度加大后视觉条会被推向右侧，故左移 (宽-厚)/2 使其回到屏幕左缘
-        int barLength = (int) (getResources().getDisplayMetrics().heightPixels * 0.6f);
-        int thickness = (int) (48 * getResources().getDisplayMetrics().density);
-        ViewGroup.LayoutParams brightnessLp = subtitleBrightnessSeekbar.getLayoutParams();
-        brightnessLp.width = barLength;
-        brightnessLp.height = thickness;
-        subtitleBrightnessSeekbar.setLayoutParams(brightnessLp);
-        subtitleBrightnessSeekbar.setTranslationX(-(barLength - thickness) / 2f);
+        layoutBrightnessSeekbar();
         int subtitleBrightness = getSubtitleBrightness();
         subtitleBrightnessSeekbar.setProgress(subtitleBrightness);
         applySubtitleBrightness(subtitleBrightness);
@@ -529,6 +523,13 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 旋转屏幕后按新的窗口尺寸重新布局左侧竖向亮度条
+        layoutBrightnessSeekbar();
+    }
+
+    @Override
     protected void onDestroy() {
         controlsHandler.removeCallbacks(hideControlsRunnable);
         if (lyricPoller != null) {
@@ -553,6 +554,32 @@ public class MainActivity extends Activity {
     /** 字幕亮度（SharedPreferences "SubtitleBrightness"，默认 100%，范围 20-100） */
     private int getSubtitleBrightness() {
         return getSharedPreferences("SubtitleBrightness", MODE_PRIVATE).getInt("SubtitleBrightness", 100);
+    }
+
+    /**
+     * 按【当前窗口高度】相对布局左侧竖向亮度条：
+     * 竖条视觉长度 = 视图宽度（rotation=270 后），取窗口高度 60%；
+     * 旋转绕视图中心，故平移 (长-厚)/2 使竖条始终贴回屏幕左缘 —— 与分辨率、旋转均无关。
+     */
+    private void layoutBrightnessSeekbar() {
+        if (subtitleBrightnessSeekbar == null) {
+            return;
+        }
+        int windowHeight;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            windowHeight = getWindowManager().getCurrentWindowMetrics().getBounds().height();
+        } else {
+            Point p = new Point();
+            getWindowManager().getDefaultDisplay().getSize(p);
+            windowHeight = p.y;
+        }
+        int barLength = (int) (windowHeight * 0.6f);
+        int thickness = (int) (48 * getResources().getDisplayMetrics().density);
+        ViewGroup.LayoutParams lp = subtitleBrightnessSeekbar.getLayoutParams();
+        lp.width = barLength;
+        lp.height = thickness;
+        subtitleBrightnessSeekbar.setLayoutParams(lp);
+        subtitleBrightnessSeekbar.setTranslationX(-(barLength - thickness) / 2f);
     }
 
     /** 将亮度百分比应用到字幕文本（黑底上降低视图 alpha 即调暗，防夜间刺眼） */
