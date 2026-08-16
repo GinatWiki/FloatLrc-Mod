@@ -12,4 +12,10 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
+    <string name="button_subtitle">字幕</string>
+    <string name="button_color">颜色</string>
+    <string name="color_preview">歌词颜色预览</string>
+    <string name="color_saved">颜色已保存</string>
+    <string name="exit_subtitle">✕</string>
+
 </resources>

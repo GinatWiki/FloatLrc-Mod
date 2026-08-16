@@ -1,6 +1,7 @@
-﻿#built application files
+#built application files
 *.apk
 *.ap_
+*.aab
 
 # files for the dex VM
 *.dex
@@ -34,4 +35,9 @@ output.json
 #NDK
 obj/
 .externalNativeBuild
+
+# 旧构建产物目录
+app/release/
+# JVM ��ת��
+*.hprof
 

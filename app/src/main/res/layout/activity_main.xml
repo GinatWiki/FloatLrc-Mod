@@ -9,25 +9,39 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
+    <!-- 底部控制条 -->
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:orientation="vertical">
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp">
 
         <Button
             android:id="@+id/button"
             android:layout_width="64dp"
             android:layout_height="wrap_content"
-            android:layout_x="66dp"
-            android:layout_y="2dp"
-            android:gravity="center"
             android:onClick="startFloatingButtonService"
             android:text="Lrc"
-            android:textAllCaps="false"
-            android:translationX="120dp"
-            android:translationY="2dp"
-            android:visibility="visible" />
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/button_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startSubtitleMode"
+            android:text="@string/button_subtitle"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/button_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showColorPickerDialog"
+            android:text="@string/button_color"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/button1"
@@ -36,20 +50,51 @@
             android:onClick="startFloatingWebViewService"
             android:text="Lrc1"
             android:visibility="invisible" />
+
         <EditText
             android:id="@+id/editTextNumber2"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
-            android:visibility="visible"
-            android:translationX="180dp"
-            android:text="15"
-            android:translationY="2dp"/>
+            android:text="15" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
+    <!-- 字幕层：字幕模式下显示，背景为网页可视化 -->
+    <TextView
+        android:id="@+id/subtitle_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/subtitle_scrim"
+        android:gravity="center"
+        android:paddingLeft="16dp"
+        android:paddingTop="48dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="24dp"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:shadowColor="#FF000000"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="6"
+        android:visibility="gone" />
 
+    <!-- 退出字幕模式按钮 -->
+    <Button
+        android:id="@+id/btn_exit_subtitle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="12dp"
+        android:background="@drawable/exit_button_bg"
+        android:onClick="exitSubtitleMode"
+        android:text="@string/exit_subtitle"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

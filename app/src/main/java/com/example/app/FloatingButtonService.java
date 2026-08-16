@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
@@ -25,20 +26,16 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.ValueCallback;
 import android.widget.Button;
 import android.widget.EditText;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class FloatingButtonService extends Service {
     public static boolean isStarted = false;
-    public static int size = 15;
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
     private Button button;
+    private LyricPoller lyricPoller;
     boolean isClosed = false;
 
 
@@ -83,62 +80,54 @@ public class FloatingButtonService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         showFloatingWindow();
 //        MainActivity.mWebView.onPause();
-        TimerTask task = new TimerTask() {
+        lyricPoller = new LyricPoller(MainActivity.mWebView, new LyricPoller.Listener() {
             @Override
-            public void run() {
-                MainActivity.mWebView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(0);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        MainActivity.mWebView.evaluateJavascript("javascript:document.getElementById(\"lyric\").innerText\n", new ValueCallback<String>() {
-                            @Override
-                            public void onReceiveValue(String s) {
-                                SpannableString ss1 = new SpannableString(s);
-                                ss1.setSpan(new ForegroundColorSpan(Color.parseColor("#bb00ff")), 0, s.length(),
-                                        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                                ss1.setSpan(new AbsoluteSizeSpan(size,true), 0, s.length(),
-                                        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                                ss1.setSpan(new StyleSpan(Typeface.BOLD), 0, s.length(),
-                                        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                                button.setText(ss1);
-
-//                                button.refreshDrawableState();
-//                                button.setOnTouchListener(new FloatingOnTouchListener());
-                            }
-                        });
-                    }
-                });
+            public void onLyric(String lyric) {
+                applyLyric(lyric);
             }
-        };
-        Timer timer = new Timer();
-        timer.schedule(task, 0, 100);
+        });
+        lyricPoller.start();
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    /** 歌词轮询回调（主线程）：按偏好颜色/字号渲染到悬浮按钮 */
+    private void applyLyric(String lyric) {
+        if (button == null) {
+            return;
+        }
+        String text = (lyric == null) ? "" : lyric;
+        SpannableString ss1 = new SpannableString(text);
+        if (ss1.length() > 0) {
+            ss1.setSpan(new ForegroundColorSpan(readColor()), 0, ss1.length(),
+                    Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            ss1.setSpan(new AbsoluteSizeSpan(readSize(), true), 0, ss1.length(),
+                    Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            ss1.setSpan(new StyleSpan(Typeface.BOLD), 0, ss1.length(),
+                    Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        }
+        button.setText(ss1);
+    }
+
+    /** 悬浮歌词颜色（SharedPreferences "Color"，默认 #bb00ff，每 tick 读取以即时生效） */
+    private int readColor() {
+        SharedPreferences colorInfo = getSharedPreferences("Color", MODE_PRIVATE);
+        return colorInfo.getInt("Color", Color.parseColor("#bb00ff"));
+    }
+
+    /** 悬浮歌词字号（SharedPreferences "Size"，解析失败回退 15） */
+    private int readSize() {
+        try {
+            String s = getSharedPreferences("Size", MODE_PRIVATE).getString("Size", "15");
+            return Integer.parseInt(s.trim());
+        } catch (Exception e) {
+            return 15;
+        }
     }
 
 
     private void showFloatingWindow() {
         if (Settings.canDrawOverlays(this)) {
-            MainActivity.mWebView.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    MainActivity.mWebView.evaluateJavascript("javascript:document.getElementById(\"lyric\").innerText\n", new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String s) {
-                            button.setText(s);
-                        }
-                    });
-                }
-            });
             button = new Button(getApplicationContext());
             if (button.getText().equals("")){
                 button.setText("SBSZZ");
@@ -147,7 +136,7 @@ public class FloatingButtonService extends Service {
 //            button.setTextColor(Color.RED);
 
             SpannableString ss1 = new SpannableString("");
-            ss1.setSpan(new AbsoluteSizeSpan(size, true), 0, 0,
+            ss1.setSpan(new AbsoluteSizeSpan(readSize(), true), 0, 0,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             button.setText(ss1);
             button.setBackgroundColor(Color.argb(0,79,79,79));
@@ -193,6 +182,9 @@ public class FloatingButtonService extends Service {
 
     @Override
     public void onDestroy() {
+        if (lyricPoller != null) {
+            lyricPoller.stop();
+        }
         destroyFloatingWindow();
         super.onDestroy();
     }
