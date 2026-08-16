@@ -16,6 +16,7 @@ import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
@@ -61,8 +62,23 @@ public class MainActivity extends Activity {
     private TextView subtitleText;
     private Button exitSubtitleButton;
     private SeekBar subtitleSizeSeekbar;
+    private View subtitleTouchLayer;
     private LyricPoller lyricPoller;
     private boolean subtitleMode = false;
+
+    /** 字幕模式控制条自动隐藏延时（5 秒） */
+    private static final long CONTROLS_HIDE_DELAY_MS = 5000L;
+    private final Handler controlsHandler = new Handler(Looper.getMainLooper());
+    private final Runnable hideControlsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!subtitleMode) {
+                return;
+            }
+            subtitleSizeSeekbar.setVisibility(View.GONE);
+            exitSubtitleButton.setVisibility(View.GONE);
+        }
+    };
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -99,6 +115,10 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 subtitleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, progress);
+                // 拖动期间重置自动隐藏倒计时，避免拉条中途消失
+                if (subtitleMode) {
+                    scheduleControlsHide();
+                }
             }
 
             @Override
@@ -110,6 +130,13 @@ public class MainActivity extends Activity {
                 SharedPreferences.Editor editor = getSharedPreferences("SubtitleSize", MODE_PRIVATE).edit();
                 editor.putInt("SubtitleSize", seekBar.getProgress());
                 editor.commit();
+            }
+        });
+        subtitleTouchLayer = findViewById(R.id.subtitle_touch_layer);
+        subtitleTouchLayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSubtitleControls();
             }
         });
         lyricPoller = new LyricPoller(mWebView, new LyricPoller.Listener() {
@@ -254,11 +281,14 @@ public class MainActivity extends Activity {
         bottomBar.setVisibility(View.GONE);
         mWebView.setVisibility(View.GONE);
         subtitleText.setVisibility(View.GONE);
+        subtitleTouchLayer.setVisibility(View.VISIBLE);
         exitSubtitleButton.setVisibility(View.VISIBLE);
         subtitleSizeSeekbar.setVisibility(View.VISIBLE);
         enterImmersive();
         hidePageLyricElement();
         lyricPoller.start();
+        // 5 秒后自动隐藏控制条，点击屏幕唤出
+        scheduleControlsHide();
     }
 
     public void exitSubtitleMode(View view) {
@@ -272,14 +302,32 @@ public class MainActivity extends Activity {
         subtitleMode = false;
         // 退出字幕播放：恢复系统默认息屏
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        controlsHandler.removeCallbacks(hideControlsRunnable);
         lyricPoller.stop();
         restorePageLyricElement();
         exitImmersive();
         subtitleText.setVisibility(View.GONE);
         exitSubtitleButton.setVisibility(View.GONE);
         subtitleSizeSeekbar.setVisibility(View.GONE);
+        subtitleTouchLayer.setVisibility(View.GONE);
         mWebView.setVisibility(View.VISIBLE);
         bottomBar.setVisibility(View.VISIBLE);
+    }
+
+    /** 重置并安排控制条 5 秒后自动隐藏 */
+    private void scheduleControlsHide() {
+        controlsHandler.removeCallbacks(hideControlsRunnable);
+        controlsHandler.postDelayed(hideControlsRunnable, CONTROLS_HIDE_DELAY_MS);
+    }
+
+    /** 唤出字幕模式控制条并重新计时 */
+    private void showSubtitleControls() {
+        if (!subtitleMode) {
+            return;
+        }
+        exitSubtitleButton.setVisibility(View.VISIBLE);
+        subtitleSizeSeekbar.setVisibility(View.VISIBLE);
+        scheduleControlsHide();
     }
 
     /** 歌词轮询回调（主线程）：空歌词时隐藏字幕层；清理前导/尾部空白防止居中偏移 */
@@ -362,6 +410,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        controlsHandler.removeCallbacks(hideControlsRunnable);
         if (lyricPoller != null) {
             lyricPoller.stop();
         }

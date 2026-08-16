@@ -80,6 +80,13 @@
         android:shadowRadius="6"
         android:visibility="gone" />
 
+    <!-- 点击层：字幕模式下捕获点击以唤出控制条（透明，必须位于控制条之下） -->
+    <View
+        android:id="@+id/subtitle_touch_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
     <!-- 字幕字号拉条：字幕模式下显示于底部 -->
     <SeekBar
         android:id="@+id/subtitle_size_seekbar"
