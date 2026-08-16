@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <com.example.app.MyWebView
+        android:id="@+id/activity_main_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:layout_x="66dp"
+            android:layout_y="2dp"
+            android:gravity="center"
+            android:onClick="startFloatingButtonService"
+            android:text="Lrc"
+            android:textAllCaps="false"
+            android:translationX="120dp"
+            android:translationY="2dp"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startFloatingWebViewService"
+            android:text="Lrc1"
+            android:visibility="invisible" />
+        <EditText
+            android:id="@+id/editTextNumber2"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:visibility="visible"
+            android:translationX="180dp"
+            android:text="15"
+            android:translationY="2dp"/>
+
+    </RelativeLayout>
+
+
+
+
+</RelativeLayout>
