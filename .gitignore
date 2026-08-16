@@ -1,4 +1,4 @@
-#built application files
+﻿#built application files
 *.apk
 *.ap_
 *.aab
@@ -25,7 +25,6 @@ Thumbs.db
 # Android Studio
 *.iml
 .idea
-#.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
 .gradle
 build/
 .navigation
@@ -38,6 +37,11 @@ obj/
 
 # 旧构建产物目录
 app/release/
-# JVM ��ת��
+
+# JVM 堆转储
 *.hprof
 
+# 签名密钥与本地密钥配置（切勿提交）
+*.jks
+*.keystore
+keystore.properties

@@ -34,11 +34,31 @@ jobs:
       - name: Set up Gradle (wrapper)
         uses: gradle/actions/setup-gradle@v3
 
+      # 从 GitHub Secrets 还原签名密钥并生成 keystore.properties
+      - name: Prepare signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > folatkikoeru-release.jks
+          cat > keystore.properties <<EOF
+          storeFile=../folatkikoeru-release.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
       - name: Make gradlew executable
         run: chmod +x gradlew
 
       - name: Build APKs
         run: ./gradlew --no-daemon assembleDebug assembleRelease
+
+      - name: Verify release signature
+        run: |
+          "$ANDROID_HOME/build-tools/31.0.0/apksigner" verify --print-certs app/build/outputs/apk/release/app-release.apk
 
       - name: Upload APKs
         uses: actions/upload-artifact@v4
