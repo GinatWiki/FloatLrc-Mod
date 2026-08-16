@@ -69,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
+        android:textAlignment="center"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:textSize="48sp"
@@ -89,7 +90,7 @@
         android:layout_marginRight="48dp"
         android:layout_marginBottom="16dp"
         android:min="24"
-        android:max="72"
+        android:max="100"
         android:progress="48"
         android:visibility="gone" />
 

@@ -282,14 +282,15 @@ public class MainActivity extends Activity {
         bottomBar.setVisibility(View.VISIBLE);
     }
 
-    /** 歌词轮询回调（主线程）：空歌词时隐藏字幕层 */
+    /** 歌词轮询回调（主线程）：空歌词时隐藏字幕层；清理前导/尾部空白防止居中偏移 */
     private void onLyricUpdate(String lyric) {
-        if (lyric == null || lyric.trim().isEmpty()) {
+        String clean = lyric == null ? null : lyric.replace('\u00A0', ' ').trim();
+        if (clean == null || clean.isEmpty()) {
             subtitleText.setVisibility(View.GONE);
             return;
         }
         subtitleText.setVisibility(View.VISIBLE);
-        subtitleText.setText(lyric);
+        subtitleText.setText(clean);
         subtitleText.setTextColor(getLyricColor());
     }
 
@@ -375,7 +376,7 @@ public class MainActivity extends Activity {
         return colorInfo.getInt("Color", Color.parseColor("#bb00ff"));
     }
 
-    /** 字幕模式字号（SharedPreferences "SubtitleSize"，默认 48sp，范围 24-72） */
+    /** 字幕模式字号（SharedPreferences "SubtitleSize"，默认 48sp，范围 24-100） */
     private int getSubtitleSize() {
         return getSharedPreferences("SubtitleSize", MODE_PRIVATE).getInt("SubtitleSize", 48);
     }
