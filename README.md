@@ -6,6 +6,8 @@
 
 **本项目原始代码由 [KirieHaruna/FloatLrc](https://github.com/KirieHaruna/FloatLrc) 的作者提供，特此致谢。**
 
+> 注：原始 Android 代码未开源（公开仓库为其早期 C# 版本），系作者直接提供给本项目使用，版权归原作者所有。请勿在未获作者许可的情况下另作他用。
+
 本仓库在原始代码的基础上继续开发，新增/修改内容：
 
 - **悬浮歌词颜色设置**：自绘 HSV 色彩轮盘（`ColorWheelView`），选色持久化保存，悬浮窗与字幕实时生效
@@ -60,4 +62,4 @@
 
 ## 许可
 
-原始代码版权归 [KirieHaruna/FloatLrc](https://github.com/KirieHaruna/FloatLrc) 原作者所有；本仓库新增代码在原项目基础上修改而来，请遵守原项目许可并保留上述署名。
+原始 Android 代码**未开源**，版权归 [KirieHaruna/FloatLrc](https://github.com/KirieHaruna/FloatLrc) 原作者所有；本仓库新增代码在原项目基础上修改而来，请遵守原作者许可并保留上述署名。
