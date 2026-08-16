@@ -1,4 +1,4 @@
-package com.example.app;
+﻿package com.folatkikoeru.app;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
         if (Url[0] == null){
             final EditText inputServer = new EditText(this);
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("输入URL").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
+            builder.setTitle("杈撳叆URL").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
                     .setNegativeButton("Cancel", null);
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 
@@ -184,7 +184,7 @@ public class MainActivity extends Activity {
             return;
         }
         if (!Settings.canDrawOverlays(this)) {
-            Toast.makeText(this, "当前无权限，请授权", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "褰撳墠鏃犳潈闄愶紝璇锋巿鏉?, Toast.LENGTH_SHORT);
             startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
         } else {
             startService(new Intent(this, FloatingButtonService.class));
@@ -208,7 +208,7 @@ public class MainActivity extends Activity {
                 return;
             }
             if (!Settings.canDrawOverlays(this)) {
-                Toast.makeText(this, "当前无权限，请授权", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "褰撳墠鏃犳潈闄愶紝璇锋巿鏉?, Toast.LENGTH_SHORT);
                 startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
             } else {
                 startService(new Intent(this, FloatingWebViewService.class));
@@ -218,14 +218,14 @@ public class MainActivity extends Activity {
 
 
 
-    // ==================== 字幕播放模式 ====================
+    // ==================== 瀛楀箷鎾斁妯″紡 ====================
 
     public void startSubtitleMode(View view) {
         if (subtitleMode) {
             return;
         }
         subtitleMode = true;
-        // 进入字幕播放：开启防息屏
+        // 杩涘叆瀛楀箷鎾斁锛氬紑鍚槻鎭睆
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         bottomBar.setVisibility(View.GONE);
         subtitleText.setVisibility(View.GONE);
@@ -244,7 +244,7 @@ public class MainActivity extends Activity {
             return;
         }
         subtitleMode = false;
-        // 退出字幕播放：恢复系统默认息屏
+        // 閫€鍑哄瓧骞曟挱鏀撅細鎭㈠绯荤粺榛樿鎭睆
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         lyricPoller.stop();
         restorePageLyricElement();
@@ -254,7 +254,7 @@ public class MainActivity extends Activity {
         bottomBar.setVisibility(View.VISIBLE);
     }
 
-    /** 歌词轮询回调（主线程）：空歌词时隐藏字幕层 */
+    /** 姝岃瘝杞鍥炶皟锛堜富绾跨▼锛夛細绌烘瓕璇嶆椂闅愯棌瀛楀箷灞?*/
     private void onLyricUpdate(String lyric) {
         if (lyric == null || lyric.trim().isEmpty()) {
             subtitleText.setVisibility(View.GONE);
@@ -296,7 +296,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** 字幕模式下隐藏页面自身的歌词区，避免与字幕层重复显示（best-effort） */
+    /** 瀛楀箷妯″紡涓嬮殣钘忛〉闈㈣嚜韬殑姝岃瘝鍖猴紝閬垮厤涓庡瓧骞曞眰閲嶅鏄剧ず锛坆est-effort锛?*/
     private void hidePageLyricElement() {
         if (mWebView == null) {
             return;
@@ -309,7 +309,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** 退出字幕模式时恢复页面歌词区原始 display */
+    /** 閫€鍑哄瓧骞曟ā寮忔椂鎭㈠椤甸潰姝岃瘝鍖哄師濮?display */
     private void restorePageLyricElement() {
         if (mWebView == null) {
             return;
@@ -339,15 +339,15 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
-    // ==================== 悬浮字体颜色设置 ====================
+    // ==================== 鎮诞瀛椾綋棰滆壊璁剧疆 ====================
 
-    /** 当前歌词颜色（SharedPreferences "Color"，默认 #bb00ff） */
+    /** 褰撳墠姝岃瘝棰滆壊锛圫haredPreferences "Color"锛岄粯璁?#bb00ff锛?*/
     private int getLyricColor() {
         SharedPreferences colorInfo = getSharedPreferences("Color", MODE_PRIVATE);
         return colorInfo.getInt("Color", Color.parseColor("#bb00ff"));
     }
 
-    /** 色彩轮盘弹窗：选择悬浮歌词颜色并持久化 */
+    /** 鑹插僵杞洏寮圭獥锛氶€夋嫨鎮诞姝岃瘝棰滆壊骞舵寔涔呭寲 */
     public void showColorPickerDialog(View view) {
         View content = getLayoutInflater().inflate(R.layout.dialog_color_picker, null);
         final ColorWheelView colorWheel = content.findViewById(R.id.color_wheel);

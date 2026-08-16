@@ -1,4 +1,4 @@
-package com.example.app;
+﻿package com.folatkikoeru.app;
 
 import android.app.Notification;
 import android.app.Service;
@@ -91,7 +91,7 @@ public class FloatingButtonService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    /** 歌词轮询回调（主线程）：按偏好颜色/字号渲染到悬浮按钮 */
+    /** 姝岃瘝杞鍥炶皟锛堜富绾跨▼锛夛細鎸夊亸濂介鑹?瀛楀彿娓叉煋鍒版偓娴寜閽?*/
     private void applyLyric(String lyric) {
         if (button == null) {
             return;
@@ -109,13 +109,13 @@ public class FloatingButtonService extends Service {
         button.setText(ss1);
     }
 
-    /** 悬浮歌词颜色（SharedPreferences "Color"，默认 #bb00ff，每 tick 读取以即时生效） */
+    /** 鎮诞姝岃瘝棰滆壊锛圫haredPreferences "Color"锛岄粯璁?#bb00ff锛屾瘡 tick 璇诲彇浠ュ嵆鏃剁敓鏁堬級 */
     private int readColor() {
         SharedPreferences colorInfo = getSharedPreferences("Color", MODE_PRIVATE);
         return colorInfo.getInt("Color", Color.parseColor("#bb00ff"));
     }
 
-    /** 悬浮歌词字号（SharedPreferences "Size"，解析失败回退 15） */
+    /** 鎮诞姝岃瘝瀛楀彿锛圫haredPreferences "Size"锛岃В鏋愬け璐ュ洖閫€ 15锛?*/
     private int readSize() {
         try {
             String s = getSharedPreferences("Size", MODE_PRIVATE).getString("Size", "15");

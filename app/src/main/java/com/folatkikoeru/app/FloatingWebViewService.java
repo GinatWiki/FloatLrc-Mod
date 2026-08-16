@@ -1,4 +1,4 @@
-package com.example.app;
+﻿package com.folatkikoeru.app;
 
 import android.app.Service;
 import android.content.Intent;
@@ -151,9 +151,9 @@ public class FloatingWebViewService extends Service {
 
             mWebView = new WebView(this);
 
-            mWebView.getSettings().setJavaScriptEnabled(true); //设置允许Js
+            mWebView.getSettings().setJavaScriptEnabled(true); //璁剧疆鍏佽Js
 
-            /*设置webview控件背景透明*/
+            /*璁剧疆webview鎺т欢鑳屾櫙閫忔槑*/
 
             mWebView.setBackgroundColor(Color.TRANSPARENT);
 

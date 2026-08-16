@@ -1,15 +1,15 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+﻿<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
 
-    <com.example.app.MyWebView
+    <com.folatkikoeru.app.MyWebView
         android:id="@+id/activity_main_webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <!-- 底部控制条 -->
+    <!-- 搴曢儴鎺у埗鏉?-->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
@@ -61,7 +61,7 @@
 
     </LinearLayout>
 
-    <!-- 字幕层：字幕模式下显示，背景为网页可视化 -->
+    <!-- 瀛楀箷灞傦細瀛楀箷妯″紡涓嬫樉绀猴紝鑳屾櫙涓虹綉椤靛彲瑙嗗寲 -->
     <TextView
         android:id="@+id/subtitle_text"
         android:layout_width="match_parent"
@@ -81,7 +81,7 @@
         android:shadowRadius="6"
         android:visibility="gone" />
 
-    <!-- 退出字幕模式按钮 -->
+    <!-- 閫€鍑哄瓧骞曟ā寮忔寜閽?-->
     <Button
         android:id="@+id/btn_exit_subtitle"
         android:layout_width="48dp"
