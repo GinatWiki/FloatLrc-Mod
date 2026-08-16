@@ -148,9 +148,11 @@ public class MainActivity extends Activity {
         subtitlePauseButton = findViewById(R.id.btn_subtitle_pause);
         updatePauseButton();
         subtitleBrightnessSeekbar = findViewById(R.id.subtitle_brightness_seekbar);
-        // 亮度条竖向显示（rotation=270），视觉长度 = 布局高度：按屏幕高度 60% 计算
+        // 竖向 SeekBar（rotation=270）：轨道沿视图宽度方向绘制，视觉长度 = 布局宽度，
+        // 因此按屏幕高度 60% 设置【宽度】，高度即视觉厚度保持 wrap_content
         ViewGroup.LayoutParams brightnessLp = subtitleBrightnessSeekbar.getLayoutParams();
-        brightnessLp.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.6f);
+        brightnessLp.width = (int) (getResources().getDisplayMetrics().heightPixels * 0.6f);
+        brightnessLp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         subtitleBrightnessSeekbar.setLayoutParams(brightnessLp);
         int subtitleBrightness = getSubtitleBrightness();
         subtitleBrightnessSeekbar.setProgress(subtitleBrightness);
