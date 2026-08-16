@@ -87,11 +87,11 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <!-- 字幕亮度拉条：字幕模式下显示于左侧（竖向，上=更亮 下=更暗；视觉长度=宽度，运行时按屏高 60% 设置） -->
+    <!-- 字幕亮度拉条：字幕模式下显示于左侧（竖向，上=更亮 下=更暗；视觉长度=宽度，运行时按屏高 60% 设置并平移回左缘） -->
     <SeekBar
         android:id="@+id/subtitle_brightness_seekbar"
         android:layout_width="320dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:layout_marginStart="12dp"
